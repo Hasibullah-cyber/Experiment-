@@ -15,6 +15,7 @@ import Admin from "@/pages/admin";
 import AdminProducts from "@/pages/admin/products";
 import AdminOrders from "@/pages/admin/orders";
 import Profile from "@/pages/profile";
+import AIChat from "@/components/ai-chat";
 
 function Router() {
   const { isAuthenticated, isLoading } = useAuth();
@@ -47,6 +48,7 @@ function App() {
       <TooltipProvider>
         <Toaster />
         <Router />
+        <AIChat />
       </TooltipProvider>
     </QueryClientProvider>
   );

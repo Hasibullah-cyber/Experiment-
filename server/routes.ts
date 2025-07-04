@@ -2,6 +2,7 @@ import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { setupAuth, isAuthenticated } from "./replitAuth";
+import { ShoppingAssistant } from "./ai";
 import { 
   insertProductSchema, 
   insertCategorySchema, 
@@ -418,6 +419,41 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Error fetching dashboard stats:", error);
       res.status(500).json({ message: "Failed to fetch dashboard stats" });
+    }
+  });
+
+  // AI Assistant routes
+  const assistant = new ShoppingAssistant();
+  
+  app.post('/api/ai/chat', async (req, res) => {
+    try {
+      const { message, chatHistory } = req.body;
+      
+      if (!message || typeof message !== 'string') {
+        return res.status(400).json({ message: "Message is required" });
+      }
+
+      const response = await assistant.generateResponse(message, chatHistory || []);
+      res.json({ response });
+    } catch (error) {
+      console.error("Error generating AI response:", error);
+      res.status(500).json({ message: "Failed to generate response" });
+    }
+  });
+
+  app.post('/api/ai/recommendations', async (req, res) => {
+    try {
+      const { query } = req.body;
+      
+      if (!query || typeof query !== 'string') {
+        return res.status(400).json({ message: "Query is required" });
+      }
+
+      const recommendations = await assistant.getProductRecommendations(query);
+      res.json({ recommendations });
+    } catch (error) {
+      console.error("Error getting recommendations:", error);
+      res.status(500).json({ message: "Failed to get recommendations" });
     }
   });
 
